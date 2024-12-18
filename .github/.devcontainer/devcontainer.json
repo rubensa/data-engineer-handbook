@@ -1,0 +1,27 @@
+// For format details, see https:https://containers.dev/implementors/spec/. For config options, see the README at:
+// https://github.com/devcontainers/images/tree/main/src/base-debian
+{
+  "name": "data-engineer-handbook-devcontainer",
+  "build": {
+    // The location of the Dockerfile that defines the contents of the container.
+    // The path is relative to the folder containing the `devcontainer.json` file.
+    "dockerfile": "Dockerfile"
+  },
+  // An object of Dev Container Feature IDs and related options to be added into your primary container.
+  "features": {
+    // https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "./local-features/node-nvm": {
+      "node-version": "22",
+      // Needed for Conventional Commits (https://github.com/vivaxy/vscode-conventional-commits)
+      "npm-packages": "@commitlint/config-conventional @commitlint/cli"
+    },
+    "./local-features/python-miniconda": {
+      "miniconda-version": "py312_24.3.0-0",
+      "conda-channels": "conda-forge",
+      "conda-environment": "base",
+      // Needed for sqlfluff (https://github.com/sqlfluff/vscode-sqlfluff)
+      "conda-packages": "sqlfluff"
+    }
+  }
+}
