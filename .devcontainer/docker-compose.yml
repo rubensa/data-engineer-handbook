@@ -1,0 +1,75 @@
+services:
+  data-engineer-handbook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - dtngnrhndbk
+    environment:
+      # Timezone
+      - TZ=Europe/Madrid
+    volumes:
+      # Mounts the project folder to '/workspaces/data-engineer-handbook'
+      - type: bind
+        source: ../
+        target: /workspaces/data-engineer-handbook
+      # User ssh keys
+      - type: bind
+        source: ${HOME}/.ssh
+        target: /home/vscode/.ssh
+      # User git config
+      - type: bind
+        source: ${HOME}/.gitconfig
+        target: /home/vscode/.gitconfig
+      # PyPI config
+      - type: bind
+        source: ${HOME}/.pypirc
+        target: /home/vscode/.pypirc
+      # VSCode server extensions cache
+      - type: volume
+        source: vscode-server-extensions-cache
+        target: /vscode/vscode-server/extensionsCache
+      # Conda packages cache
+      - type: volume
+        source: conda-packages-cache
+        target: /usr/local/share/conda/pkgs
+      # User pip cache
+      - type: volume
+        source: pip-cache
+        target: /home/vscode/.cache/pip
+  postgres:
+    image: postgres:14
+    networks:
+      - dtngnrhndbk
+    restart: on-failure
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ../bootcamp/materials/1-dimensional-data-modeling:/bootcamp/
+      - ../bootcamp/materials/1-dimensional-data-modeling/data.dump:/docker-entrypoint-initdb.d/data.dump
+      - ../bootcamp/materials/1-dimensional-data-modeling/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - postgres-data:/var/lib/postgresql/data
+
+networks:
+  dtngnrhndbk:
+    # Join a network with given name
+    external: true
+    name: dtngnrhndbk
+
+volumes:
+  vscode-server-extensions-cache:
+    # Join a volume with given name
+    external: true
+    name: vscode-server-extensions-cache
+  conda-packages-cache:
+    # Join a volume with given name
+    external: true
+    name: conda-packages-cache
+  pip-cache:
+    # Join a volume with given name
+    external: true
+    name: pip-cache
+  postgres-data:
+    # The postgres-data volume is only for the project (not shared)

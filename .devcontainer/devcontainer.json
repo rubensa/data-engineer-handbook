@@ -1,0 +1,284 @@
+{
+  // see: https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainerjson-reference.md
+  // see: https://containers.dev/implementors/json_reference/
+  // see: https://code.visualstudio.com/docs/getstarted/settings#_default-settings
+  // see: https://code.visualstudio.com/docs/editor/variables-reference
+  ////////////////////////
+  // General properties //
+  ////////////////////////
+  // A display name for the container.
+  "name": "data-engineer-handbook",
+  // A set of name-value pairs that sets or overrides environment variables for the devcontainer.json supporting
+  // service / tool (or sub-processes like terminals) but not the container as a whole.
+  "remoteEnv": {
+    // You can reference the env var when running Docker commands from the terminal inside the container.
+    // docker run -it --rm -v "${LOCAL_WORKSPACE_FOLDER//\\/\/}:/workspace" debian bash
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+    // This is used in onCreateCommand.sh
+    "CONTAINER_WORKSPACE_FOLDER": "${containerWorkspaceFolder}",
+    // GitHub credentials
+    "GITHUB_USER": "${localEnv:GITHUB_USER}",
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
+    // Make Python avoid to write .pyc files and generate __pycache__ folders.
+    // https://docs.python.org/3/using/cmdline.html#envvar-PYTHONDONTWRITEBYTECODE
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  // Overrides the user that devcontainer.json supporting services tools / runs as in the container 
+  // (along with sub-processes like terminals, tasks, or debugging).
+  "remoteUser": "vscode",
+  // Overrides the user for all operations run as inside the container.
+  "containerUser": "vscode",
+  // On Linux, the container user's UID/GID will be updated to match your local user.
+  "updateRemoteUserUID": true,
+  // Indicates the type of shell VS Code should use to "probe" for user environment variables to use by default
+  // while debugging or running a task: none (default), interactiveShell, loginShell, or loginInteractiveShell.
+  // Fire ~/.bashrc, ~/.zshrc before starting VS Code processes
+  "userEnvProbe": "interactiveShell",
+  // Tells VS Code and other devcontainer.json supporting services / tools 
+  // whether they should run /bin/sh -c "while sleep 1000; do :; done" 
+  // when starting the container instead of the container's default command 
+  // (since the container can shut down if the default command fails).
+  "overrideCommand": false,
+  // Indicates whether VS Code and other devcontainer.json supporting tools should stop 
+  // the containers when the related tool window is closed / shut down.
+  "shutdownAction": "stopCompose",
+  ////////////////////////////////////////
+  // Docker Compose specific properties //
+  ////////////////////////////////////////
+  // Path or an ordered list of paths to Docker Compose files.
+  // The path is relative to the devcontainer.json file.
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  // The name of the service VS Code and other devcontainer.json 
+  // supporting services / tools should connect to once running.
+  "service": "data-engineer-handbook",
+  // An array of services in your Docker Compose configuration that should be started 
+  // by VS Code and other devcontainer.json supporting services / tools. 
+  // These will also be stopped when you disconnect unless "shutdownAction" is "none".
+  "runServices": [
+    "postgres"
+  ],
+  // Sets the default path that VS Code and other devcontainer.json supporting services / tools 
+  // should open when connecting to the container 
+  // (which is often the path to a volume mount where the source code can be found in the container).
+  "workspaceFolder": "/workspaces/data-engineer-handbook",
+  ///////////////////////
+  // Lifecycle scripts //
+  ///////////////////////
+  // A command string or list of command arguments to run on the host machine before the container is created.
+  // The command executes from the workspaceFolder locally.
+  "initializeCommand": [
+    ".devcontainer/initializeCommand.sh"
+  ],
+  // A command string or list of command arguments to run inside the container after it has started for the first time.
+  // The commands execute from the workspaceFolder in the container.
+  // The array syntax will invoke the command directly without using a shell.
+  "onCreateCommand": [
+    ".devcontainer/onCreateCommand.sh"
+  ],
+  // Command any tool should wait for before connecting.
+  "waitFor": "onCreateCommand",
+  /////////////////////////////////
+  // VS Code specific properties //
+  /////////////////////////////////
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // An array of extension IDs that specify the extensions that should be installed inside the container when it is created.
+      "extensions": [
+        /////////
+        // GIT //
+        /////////
+        // Git Graph (https://github.com/mhutchie/vscode-git-graph)
+        "mhutchie.git-graph",
+        // GitLens — Git supercharged (https://github.com/gitkraken/vscode-gitlens)
+        "eamodio.gitlens",
+        // Conventional Commits (https://github.com/vivaxy/vscode-conventional-commits)
+        "vivaxy.vscode-conventional-commits",
+        /////////////////
+        // DEVELOPMENT //
+        /////////////////
+        // Docker (https: //github.com/microsoft/vscode-docker)
+        "ms-azuretools.vscode-docker",
+        // YAML Language Support by Red Hat, with built-in Kubernetes syntax support (https://github.com/redhat-developer/vscode-yaml)
+        "redhat.vscode-yaml",
+        // sqlfluff (https://github.com/sqlfluff/vscode-sqlfluff)
+        "dorzey.vscode-sqlfluff",
+        // SQLTools (https://github.com/mtxr/vscode-sqltools)
+        "mtxr.sqltools",
+        // SQLTools PostgreSQL/Cockroach Driver (https://github.com/mtxr/vscode-sqltools/tree/dev/packages/driver.pg)
+        "mtxr.sqltools-driver-pg",
+        // Python (https://github.com/Microsoft/vscode-python)
+        "ms-python.python",
+        // Jupyter (https://github.com/Microsoft/vscode-jupyter)
+        "ms-toolsai.jupyter",
+        // Ruff (https://github.com/astral-sh/ruff-vscode)
+        "charliermarsh.ruff",
+        // Data Wrangler (https://github.com/microsoft/vscode-data-wrangler)
+        "ms-toolsai.datawrangler"
+      ],
+      // Adds default settings.json values into a container/machine specific settings file.
+      "settings": {
+        //////////////////////////////////////////////////////////////////////////////////
+        // Conventional Commits (https://github.com/vivaxy/vscode-conventional-commits) //
+        //////////////////////////////////////////////////////////////////////////////////
+        // Control whether the extension should commit files after: forming the message or closing the editor tab.
+        "conventionalCommits.autoCommit": false,
+        // Specify which format will be shown in the gitmoji.
+        "conventionalCommits.emojiFormat": "emoji",
+        // Specify which word will be treated as line breaks in the body. Blank means no line breaks.
+        "conventionalCommits.lineBreak": "\\n",
+        // Control whether the extension should prompt for the scope section.
+        "conventionalCommits.promptScopes": false,
+        ///////////////////////////////////////////////////////////
+        // Jupyter (https://github.com/Microsoft/vscode-jupyter) //
+        ///////////////////////////////////////////////////////////
+        // Run a series of Code Actions for a notebook on save.
+        // Code Actions must be specified and the editor must not be shutting down.
+        // When #files.autoSave# is set to afterDelay, Code Actions will only be run when the file is saved explicitly.
+        // Example: "notebook.source.organizeImports": "explicit"
+        "notebook.codeActionsOnSave": {
+          // Configure Ruff to organize imports on-save
+          "notebook.source.organizeImports": "explicit"
+        },
+        // Format a notebook on save. A formatter must be available and the editor must not be shutting down.
+        "notebook.formatOnSave.enabled": true,
+        /////////////////////////////////////////////////////////
+        // Python (https://github.com/Microsoft/vscode-python) //
+        /////////////////////////////////////////////////////////
+        // Absolute path to a file containing environment variable definitions.
+        "python.envFile": "${workspaceFolder}/.devcontainer/.env.local",
+        // Set the Python Language Server
+        "python.languageServer": "Pylance",
+        // Prevent automatic activation of a selected environment
+        "python.terminal.activateEnvironment": false,
+        ////////////////////////////////////////////////////////////
+        // sqlfluff (https://github.com/sqlfluff/vscode-sqlfluff) //
+        ////////////////////////////////////////////////////////////
+        // The dialect of SQL to lint.
+        "sqlfluff.dialect": "postgres",
+        // Exclude specific rules. The excludedRules from the global settings and workspace settings are combined.
+        "sqlfluff.excludeRules": [
+          // AM04: Use of SELECT * in a query
+          "AM04"
+        ],
+        // Determines if the document formatter is enabled.
+        "sqlfluff.format.enabled": true,
+        // The languages formating is enabled for.
+        "sqlfluff.format.languages": [
+          "sql",
+          "sql-bigquery",
+          "jinja-sql",
+          "postgres",
+          {
+            "language": "yaml",
+            "contextMenuFormatOptions": true,
+            "preserveLeadingWhitespace": true
+          }
+        ],
+        // Determines if the linter runs on save, on type, or disabled.
+        "sqlfluff.linter.run": "onType",
+        // Set the default diagnostic severity of the linting results.
+        "sqlfluff.linter.diagnosticSeverity": "error",
+        // Set the diagnostic severity of individual linting results.
+        "sqlfluff.linter.diagnosticSeverityByRule": [
+          {
+            "rule": "L010", // Inconsistent capitalisation of keywords.
+            "severity": "warning"
+          }
+        ],
+        // Determines if the linter will lint the workspaces on startup and configuration changes.
+        "sqlfluff.linter.lintEntireProject": false,
+        ////////////////////////////////////////////////////////
+        // SQLTools (https://github.com/mtxr/vscode-sqltools) //
+        ////////////////////////////////////////////////////////
+        // Connections list.
+        "sqltools.connections": [
+          {
+            "previewLimit": 50,
+            "server": "postgres",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "postgres",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "postgres"
+          }
+        ],
+        ////////////
+        // Editor //
+        ////////////
+        // Controls whether `editor.tabSize#` and `#editor.insertSpaces` will be automatically detected when a file is opened based on the file contents.
+        "editor.detectIndentation": false,
+        // Controls whether the editor should automatically format the pasted content. A formatter must be available and the formatter should be able to format a range in a document.
+        "editor.formatOnPaste": true,
+        // Format a file on save. A formatter must be available, the file must not be saved after delay, and the editor must not be shutting down.
+        "editor.formatOnSave": true,
+        // Controls whether the editor should automatically format the line after typing.
+        "editor.formatOnType": true,
+        // The number of spaces a tab is equal to. This setting is overridden based on the file contents when `editor.detectIndentation` is on.
+        "editor.tabSize": 2,
+        ////////////////
+        // Extensions //
+        ////////////////
+        // Disable extension signature verification to avoid
+        // "ENOENT: no such file or directory" error when installing extensions.
+        // see: https://github.com/microsoft/vscode/issues/208043#issuecomment-2100819301
+        "extensions.verifySignature": false,
+        //////////////
+        // Terminal //
+        //////////////
+        // The default profile used on Linux. This setting will currently be ignored if either `terminal.integrated.shell.linux` or `terminal.integrated.shellArgs.linux` are set.
+        "terminal.integrated.defaultProfile.linux": "bash",
+        // The Linux profiles to present when creating a new terminal via the terminal dropdown. Set the `path` property manually with an optional `args`.
+        // Set an existing profile to `null` to hide the profile from the list, for example: `"bash": null`.
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "args": [
+              // Run interactive bash shell in VSCode integrated terminal
+              "-i"
+            ]
+          }
+        },
+        ////////////
+        // Remote //
+        ////////////
+        // When enabled, new running processes are detected and ports that they listen on are automatically forwarded. Disabling this setting will not prevent all ports from being forwarded. Even when disabled, extensions will still be able to cause ports to be forwarded, and opening some URLs will still cause ports to forwarded.
+        "remote.autoForwardPorts": false,
+        /////////////////////////////////////
+        // Default Configuration Overrides //
+        /////////////////////////////////////
+        // Configure settings to be overridden for the yaml language.
+        "[yaml]": {
+          // Defines a default formatter which takes precedence over all other formatter settings.
+          // Must be the identifier of an extension contributing a formatter.
+          // YAML Language Support by Red Hat, with built-in Kubernetes syntax support
+          "editor.defaultFormatter": "redhat.vscode-yaml"
+        },
+        /////////////////////////////////////
+        // Default Configuration Overrides //
+        /////////////////////////////////////
+        "[python]": {
+          // Defines a default formatter which takes precedence over all other formatter settings.
+          // Must be the identifier of an extension contributing a formatter.
+          // charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter.
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          // Format a file on save. A formatter must be available and the editor must not be shutting down.
+          // When #files.autoSave# is set to afterDelay, the file will only be formatted when saved explicitly.
+          "editor.formatOnSave": true,
+          // Configure Ruff to organize imports on-save
+          "source.organizeImports": "explicit"
+        },
+        // Configure settings to be overridden for the sql language.
+        "[sql]": {
+          // Defines a default formatter which takes precedence over all other formatter settings.
+          // Must be the identifier of an extension contributing a formatter.
+          "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
+        }
+      }
+    }
+  }
+}
