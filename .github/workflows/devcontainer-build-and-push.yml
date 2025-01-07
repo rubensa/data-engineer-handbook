@@ -1,0 +1,60 @@
+name: Dev Container Build and Push Image
+
+# allow manually triggered build specifying the tag
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Specify the Docker image tag for the build"
+        required: true
+        default: "latest"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build-and-push"
+  build-and-push:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # https://github.com/actions/checkout
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v4
+
+      # Allow Buildx multi-platform builds
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU for multi-architecture builds
+        uses: docker/setup-qemu-action@v3
+
+      # Setup Buildx as the builder
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker buildx for multi-architecture builds
+        uses: docker/setup-buildx-action@v3
+        with:
+          use: true
+
+      # Use Personal Access Token (PAT) and username to log into Docker Hub
+      # https://github.com/docker/login-action
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Dev Container Build and Run
+      # https://github.com/devcontainers/ci
+      - name: Pre-build multi-platform dev container image
+        uses: devcontainers/ci@v0.3
+        env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: true # https://github.com/devcontainers/ci/issues/191#issuecomment-1603857155
+        with:
+          subFolder: .github
+          imageName: ghcr.io/${{ github.repository }}-devcontainer
+          # for manual trigger use the specified tag
+          imageTag: ${{ github.event.inputs.tag }}
+          platform: linux/amd64,linux/arm64
+          cacheFrom: ghcr.io/${{ github.repository }}-devcontainer
+          push: always

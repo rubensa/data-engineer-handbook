@@ -1,0 +1,58 @@
+{
+  // see: https://containers.dev/implementors/features/#devcontainer-feature-json-properties
+  "id": "node-nvm",
+  "version": "0.0.1",
+  "name": "Node.js (via nvm)",
+  "description": "Installs Node.js using nvm (Node Version Manager).",
+  "documentationURL": "https://github.com/rubensa/devcontainers-features/tree/main/src/node-nvm",
+  "options": {
+    "nvm-version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "v0.39.7",
+        "v0.38.0",
+        "v0.37.2"
+      ],
+      "default": "latest",
+      "description": "Version of NVM to install (https://github.com/nvm-sh/nvm/releases)."
+    },
+    "add-nvm-bash-completion": {
+      "type": "boolean",
+      "default": true,
+      "description": "Add nvm bash completion?"
+    },
+    "node-version": {
+      "type": "string",
+      "proposals": [
+        "lts",
+        "latest",
+        "none",
+        "20",
+        "18",
+        "16",
+        "14"
+      ],
+      "default": "lts",
+      "description": "Select or enter a Node.js version to install (nvm ls-remote)."
+    },
+    "add-node-bash-completion": {
+      "type": "boolean",
+      "default": true,
+      "description": "Add node bash completion?"
+    },
+    "add-npm-bash-completion": {
+      "type": "boolean",
+      "default": true,
+      "description": "Add npm bash completion?"
+    },
+    "npm-packages": {
+      "type": "string",
+      "proposals": [
+        "@commitlint/config-conventional @commitlint/cli"
+      ],
+      "default": "",
+      "description": "Enter a list of npm packages to install."
+    }
+  }
+}
